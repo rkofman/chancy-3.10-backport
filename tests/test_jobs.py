@@ -117,7 +117,7 @@ async def test_wait_for_job_timeout(
     assert j.state == j.State.SUCCEEDED
 
     ref = await chancy.push(slow_job_to_run.job.with_queue("low"))
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await chancy.wait_for_job(ref, timeout=0.1)
 
 

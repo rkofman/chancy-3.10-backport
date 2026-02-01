@@ -3,8 +3,16 @@ import datetime
 import enum
 import functools
 import logging
+import sys
 from typing import Any, Iterator, AsyncGenerator
 from functools import cached_property, cache
+
+if sys.version_info >= (3, 11):
+    from asyncio import timeout as async_timeout
+    from enum import StrEnum
+else:
+    from taskgroup import timeout as async_timeout
+    from backports.strenum import StrEnum
 
 from psycopg import sql, Cursor, AsyncCursor
 from psycopg.rows import dict_row, DictRow
@@ -114,7 +122,7 @@ class Chancy:
         enabled. Defaults to `False`.
     """
 
-    class Executor(enum.StrEnum):
+    class Executor(StrEnum):
         """
         Shortcuts for the built-in executors.
         """
@@ -811,7 +819,7 @@ class Chancy:
             FAILED states are considered complete.
         """
         states = states or {QueuedJob.State.SUCCEEDED, QueuedJob.State.FAILED}
-        async with asyncio.timeout(timeout):
+        async with async_timeout(timeout):
             while True:
                 job = await self.get_job(ref)
                 if job is None or job.state in states:
@@ -849,7 +857,7 @@ class Chancy:
             not be included in the list.
         """
         states = states or {QueuedJob.State.SUCCEEDED, QueuedJob.State.FAILED}
-        async with asyncio.timeout(timeout):
+        async with async_timeout(timeout):
             pending = set(refs)
             completed = []
             while pending:

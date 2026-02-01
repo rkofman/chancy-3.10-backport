@@ -1,5 +1,11 @@
 import asyncio
+import sys
 from asyncio import CancelledError
+
+if sys.version_info >= (3, 11):
+    from asyncio import timeout as async_timeout
+else:
+    from taskgroup import timeout as async_timeout
 
 from chancy import Reference
 from chancy.executors.base import Executor
@@ -63,7 +69,7 @@ class AsyncExecutor(Executor):
                 None,
             )
 
-            async with asyncio.timeout(timeout):
+            async with async_timeout(timeout):
                 result = await func(**kwargs)
             await self.on_job_completed(job=job, result=result)
         except (Exception, CancelledError) as exc:

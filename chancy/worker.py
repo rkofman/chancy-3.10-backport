@@ -12,6 +12,11 @@ import sys
 import warnings
 from collections import defaultdict
 
+if sys.version_info >= (3, 11):
+    from asyncio import timeout as async_timeout
+else:
+    from taskgroup import timeout as async_timeout
+
 from psycopg import sql
 from psycopg import AsyncConnection
 from psycopg.rows import dict_row
@@ -314,7 +319,7 @@ class Worker:
                     ["queue.declared", "queue.paused", "queue.resumed"],
                     timeout=self.queue_change_poll_interval,
                 )
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
     async def _maintain_queue(self, queue: Queue):
@@ -814,7 +819,7 @@ class Worker:
         returned due to the timeout expiring.
         """
         try:
-            async with asyncio.timeout(self.shutdown_timeout) as cm:
+            async with async_timeout(self.shutdown_timeout) as cm:
                 # Stop accepting new queues and queue changes.
                 try:
                     await self.manager.cancel("queues")
