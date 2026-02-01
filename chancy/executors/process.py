@@ -2,7 +2,6 @@ import asyncio
 import functools
 import multiprocessing
 import os
-import sys
 import warnings
 from multiprocessing.context import BaseContext
 
@@ -16,10 +15,7 @@ import signal
 from asyncio import Future, CancelledError
 from typing import Callable, Any
 
-if sys.version_info >= (3, 11):
-    from concurrent.futures import ProcessPoolExecutor
-else:
-    from deadpool import Deadpool as ProcessPoolExecutor
+from deadpool import Deadpool as ProcessPoolExecutor
 
 from chancy import Reference
 from chancy.executors.base import ConcurrentExecutor
@@ -80,9 +76,11 @@ class ProcessExecutor(ConcurrentExecutor):
         self.pids_for_job = self.manager.dict()
         self.timeouts: dict[str, asyncio.Task] = {}
 
-        # Python 3.10: deadpool-executor breaks on macOS without explicit max_workers
-        # because it relies on os.sched_getaffinity(0) which macOS lacks. We avoid the
-        # call to os.sched_getaffinity(0) by setting an explicit max_workers count.
+        # deadpool-executor breaks on macOS without explicit max_workers because
+        # it relies on os.sched_getaffinity(0) which is Linux-only. Python 3.13+
+        # added os.process_cpu_count() as a cross-platform alternative, but deadpool
+        # hasn't been updated to use it yet. We avoid the sched_getaffinity call by
+        # always providing an explicit max_workers value.
         max_workers = queue.concurrency or multiprocessing.cpu_count()
 
         self.pool = ProcessPoolExecutor(
