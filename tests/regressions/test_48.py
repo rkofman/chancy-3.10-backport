@@ -36,7 +36,7 @@ async def test_regression_48(chancy: Chancy, worker: Worker):
 
     # This will take 25 seconds, as the worker will process one job, then
     # wait 5 seconds before fetching the next job.
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await chancy.wait_for_jobs(all_refs, timeout=10)
 
 

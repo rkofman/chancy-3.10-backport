@@ -212,7 +212,7 @@ async def test_workflow_timeout(chancy: Chancy, worker):
 
     workflow_id = await WorkflowPlugin.push(chancy, workflow)
 
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(TimeoutError):
         await WorkflowPlugin.wait_for_workflow(chancy, workflow_id, timeout=0.1)
 
 

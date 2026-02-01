@@ -9,9 +9,15 @@ import json
 import secrets
 import itertools
 import contextlib
+import sys
 from dataclasses import is_dataclass, asdict
-from typing import Iterable, Coroutine, NotRequired, Any, TypedDict
+from typing import Iterable, Coroutine, Any, TypedDict
 from urllib.parse import quote_plus, urlencode, urlunparse
+
+if sys.version_info >= (3, 11):
+    from typing import NotRequired
+else:
+    from typing_extensions import NotRequired
 
 
 class DatabaseConnection(TypedDict):

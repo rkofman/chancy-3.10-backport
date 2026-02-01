@@ -1,11 +1,19 @@
 import asyncio
 import enum
+import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import partial
-from typing import List, Dict, TextIO, Self
+from typing import List, Dict, TextIO
 from psycopg import sql, AsyncCursor
 from psycopg.rows import dict_row, DictRow
+
+if sys.version_info >= (3, 11):
+    from asyncio import timeout as async_timeout
+    from typing import Self
+else:
+    from taskgroup import timeout as async_timeout
+    from typing_extensions import Self
 
 from chancy.hub import Event
 from chancy.plugin import Plugin
@@ -897,7 +905,7 @@ class WorkflowPlugin(Plugin):
         :raises KeyError: If the workflow does not exist.
         :return: The completed Workflow object.
         """
-        async with asyncio.timeout(timeout):
+        async with async_timeout(timeout):
             while True:
                 workflow = await cls.fetch_workflow(chancy, workflow_id)
                 if workflow is None:
