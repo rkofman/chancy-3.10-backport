@@ -3,12 +3,16 @@ name = "chancy"
 version = "0.25.1"
 description = "A simple and flexible job queue for Python"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 authors = [
     { name = "Tyler Kennedy", email = "tk@tkte.ch" }
 ]
 dependencies = [
     "psycopg[pool]>=3.2.1",
+    "typing-extensions>=4.6.0; python_version<'3.11'",
+    "taskgroup>=0.2.0; python_version<'3.11'",
+    "backports.strenum>=1.3.1; python_version<'3.11'",
+    "deadpool-executor>=1.0.0; python_version<'3.11'",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -16,6 +20,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
 
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
